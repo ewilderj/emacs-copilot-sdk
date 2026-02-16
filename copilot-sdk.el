@@ -271,13 +271,29 @@ PARAMS-SCHEMA is an optional JSON Schema plist for the tool's parameters."
   "Return the current tool definitions as a vector (for JSON serialization)."
   (vconcat copilot-sdk--tool-defs))
 
-(defun copilot-sdk-tool-result (type text &rest format-args)
-  "Build a tool result plist.
-TYPE is \"success\", \"failure\", or \"rejected\".
-TEXT is the result string; if FORMAT-ARGS are given, TEXT is
-passed through `format' with them."
+(defun copilot-sdk-tool-success (text &rest format-args)
+  "Build a successful tool result.
+TEXT is the result string; FORMAT-ARGS are passed to `format'."
   (let ((msg (if format-args (apply #'format text format-args) text)))
-    `(:textResultForLlm ,msg :resultType ,type)))
+    `(:textResultForLlm ,msg :resultType "success")))
+
+(defun copilot-sdk-tool-failure (text &rest format-args)
+  "Build a failed tool result.
+TEXT is the error string; FORMAT-ARGS are passed to `format'."
+  (let ((msg (if format-args (apply #'format text format-args) text)))
+    `(:textResultForLlm ,msg :resultType "failure")))
+
+(defun copilot-sdk-tool-rejected (text &rest format-args)
+  "Build a rejected (permission denied) tool result.
+TEXT is the explanation; FORMAT-ARGS are passed to `format'."
+  (let ((msg (if format-args (apply #'format text format-args) text)))
+    `(:textResultForLlm ,msg :resultType "rejected")))
+
+(defun copilot-sdk-tool-denied (text &rest format-args)
+  "Build a denied tool result.
+TEXT is the explanation; FORMAT-ARGS are passed to `format'."
+  (let ((msg (if format-args (apply #'format text format-args) text)))
+    `(:textResultForLlm ,msg :resultType "denied")))
 
 (defun copilot-sdk-clear-tools ()
   "Remove all registered tools."
