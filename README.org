@@ -152,6 +152,15 @@ UI.  Build your Emacs assistant on top of this.
 emacs --batch -L . -l test-copilot-sdk.el -f ert-run-tests-batch-and-exit
 #+end_src
 
+** Examples
+
+See [[https://github.com/ewilderj/emacs-copilot-sdk-examples][emacs-copilot-sdk-examples]] for working applications built on this SDK:
+
+- *echo-bot* — minimal hello world (~35 lines)
+- *docstring* — generate docstrings for functions at point
+- *commit-message* — AI commit messages in a vc-style popup buffer
+- *org-process* — AI-powered GTD inbox processor for org-mode
+
 ** License
 
 GPL-3.0-or-later.  See [[file:LICENSE][LICENSE]].
