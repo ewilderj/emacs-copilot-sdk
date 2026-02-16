@@ -1,0 +1,157 @@
+* copilot-sdk.el
+
+By [[https://github.com/ewilderj][Edd Wilder-James]], co-authored with [[https://github.com/features/copilot][GitHub Copilot]].
+
+Pure Emacs Lisp client for the [[https://githubnext.com/projects/copilot-sdk][GitHub Copilot SDK]].
+
+Talks directly to the Copilot CLI over JSON-RPC 2.0 with Content-Length
+framing — the same protocol [[https://github.com/joaotavora/eglot][eglot]] uses for LSP.
+
+** Requirements
+
+- Emacs 29.1+
+- =jsonrpc= 1.0.25+ (built-in since Emacs 27)
+- The =copilot= CLI binary (from the Copilot SDK)
+- A valid GitHub Copilot authentication token (=GH_TOKEN= env var or
+  pre-authenticated via =copilot auth=)
+
+** Installation
+
+*** From MELPA (planned)
+
+#+begin_src elisp
+(use-package copilot-sdk)
+#+end_src
+
+*** Manual
+
+#+begin_src bash
+git clone https://github.com/ewilderj/emacs-copilot-sdk
+#+end_src
+
+Add to your =load-path=:
+
+#+begin_src elisp
+(add-to-list 'load-path "/path/to/emacs-copilot-sdk")
+(require 'copilot-sdk)
+#+end_src
+
+** Quick Start
+
+#+begin_src elisp
+;; Start the CLI connection
+(copilot-sdk-start)
+
+;; Define a tool the model can call
+(copilot-sdk-define-tool
+ "get_time" "Get the current time."
+ (lambda (_args)
+   `(:textResultForLlm ,(current-time-string) :resultType "success")))
+
+;; Create a session
+(setq my-session
+      (copilot-sdk-create-session
+       :model "claude-sonnet-4-5"
+       :tools (copilot-sdk-tool-defs)
+       :system-message "You are a helpful assistant."))
+
+;; Send a message (async — callbacks fire as events arrive)
+(copilot-sdk-send my-session "What time is it?"
+ :on-message (lambda (text) (message "Response: %s" text))
+ :on-idle    (lambda () (message "Done.")))
+
+;; Or send and block until response
+(copilot-sdk-send-and-wait my-session "What time is it?")
+#+end_src
+
+** API Overview
+
+*** Connection
+
+| Function                       | Description                    |
+|--------------------------------+--------------------------------|
+| =copilot-sdk-start=            | Start the CLI subprocess       |
+| =copilot-sdk-stop=             | Stop the CLI subprocess        |
+| =copilot-sdk-connected-p=      | Check if connected             |
+| =copilot-sdk-ensure-connected= | Start if not already connected |
+
+*** Sessions
+
+| Function                       | Description                    |
+|--------------------------------+--------------------------------|
+| =copilot-sdk-create-session=   | Create a new session           |
+| =copilot-sdk-resume-session=   | Resume an existing session     |
+| =copilot-sdk-destroy-session=  | Destroy a session              |
+| =copilot-sdk-delete-session=   | Permanently delete a session   |
+| =copilot-sdk-list-sessions=    | List all sessions              |
+
+*** Messaging
+
+| Function                    | Description                         |
+|-----------------------------+-------------------------------------|
+| =copilot-sdk-send=          | Send message (async with callbacks) |
+| =copilot-sdk-send-and-wait= | Send message and block for response |
+
+*** Tools
+
+| Function                  | Description                        |
+|---------------------------+------------------------------------|
+| =copilot-sdk-define-tool= | Register a tool the model can call |
+| =copilot-sdk-tool-defs=   | Get tool definitions (for sessions)|
+| =copilot-sdk-clear-tools= | Remove all tools                   |
+
+*** Handlers
+
+| Function                             | Description                 |
+|--------------------------------------+-----------------------------|
+| =copilot-sdk-set-permission-handler= | Handle permission requests  |
+| =copilot-sdk-set-user-input-handler= | Handle user input requests  |
+| =copilot-sdk-on=                     | Subscribe to session events |
+
+*** Queries
+
+| Function                 | Description              |
+|--------------------------+--------------------------|
+| =copilot-sdk-ping=       | Ping the CLI             |
+| =copilot-sdk-status=     | Get CLI version info     |
+| =copilot-sdk-auth-status= | Check authentication     |
+| =copilot-sdk-list-models= | List available models    |
+
+** Configuration
+
+| Variable                  | Default     | Description            |
+|---------------------------+-------------+------------------------|
+| =copilot-sdk-cli-path=    | ="copilot"= | Path to the CLI binary |
+| =copilot-sdk-log-level=   | ="info"=    | CLI log level          |
+
+Set =COPILOT_CLI_PATH= environment variable to override the CLI path.
+
+** Architecture
+
+This package is a thin client — it manages the CLI subprocess and
+dispatches JSON-RPC messages.  It is intentionally unopinionated about
+UI.  Build your Emacs assistant on top of this.
+
+#+begin_example
+┌──────────────────────────────────────┐
+│ Your Application (e.g. emacs-copilot)│
+├──────────────────────────────────────┤
+│ copilot-sdk.el                       │
+│   jsonrpc-process-connection         │
+├──────────────────────────────────────┤
+│ copilot CLI (Node.js subprocess)     │
+│   JSON-RPC 2.0 / stdio               │
+├──────────────────────────────────────┤
+│ GitHub Copilot API                   │
+└──────────────────────────────────────┘
+#+end_example
+
+** Running Tests
+
+#+begin_src bash
+emacs --batch -L . -l test-copilot-sdk.el -f ert-run-tests-batch-and-exit
+#+end_src
+
+** License
+
+GPL-3.0-or-later.  See [[file:LICENSE][LICENSE]].

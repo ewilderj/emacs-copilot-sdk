@@ -1,0 +1,8 @@
+;;; MELPA Recipe — submit this as a PR to melpa/melpa recipes/copilot-sdk
+;;;
+;;; File: recipes/copilot-sdk
+;;; Content:
+
+(copilot-sdk :fetcher github
+             :repo "ewilderj/emacs-copilot-sdk"
+             :files ("copilot-sdk.el"))
