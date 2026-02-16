@@ -183,15 +183,15 @@ Does nothing if already connected."
 
 (defun copilot-sdk--handle-request (_conn method params)
   "Handle incoming JSON-RPC requests from the CLI.
-METHOD is the request method string, PARAMS is a plist."
+METHOD is a symbol (interned by jsonrpc), PARAMS is a plist."
   (pcase method
-    ("tool.call"
+    ('tool.call
      (copilot-sdk--dispatch-tool-call params))
-    ("permission.request"
+    ('permission.request
      (copilot-sdk--dispatch-permission params))
-    ("userInput.request"
+    ('userInput.request
      (copilot-sdk--dispatch-user-input params))
-    ("hooks.invoke"
+    ('hooks.invoke
      '(:output nil))))
 
 (defun copilot-sdk--handle-notification (_conn method params)

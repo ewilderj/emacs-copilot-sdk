@@ -395,7 +395,7 @@
      (lambda (args) `(:textResultForLlm ,(plist-get args :text)
                       :resultType "success")))
     (let ((result (copilot-sdk--handle-request
-                   nil "tool.call"
+                   nil 'tool.call
                    '(:toolName "echo" :arguments (:text "hi")))))
       (should (string= "hi" (plist-get (plist-get result :result)
                                        :textResultForLlm))))))
@@ -404,7 +404,7 @@
   "hooks.invoke should return (:output nil)."
   (copilot-sdk-test-with-clean-state
     (let ((result (copilot-sdk--handle-request
-                   nil "hooks.invoke"
+                   nil 'hooks.invoke
                    '(:sessionId "s1" :hookType "preToolUse" :input nil))))
       (should (null (plist-get result :output))))))
 
