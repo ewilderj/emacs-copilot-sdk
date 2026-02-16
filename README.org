@@ -49,7 +49,7 @@ Add to your =load-path=:
 (copilot-sdk-define-tool
  "get_time" "Get the current time."
  (lambda (_args)
-   `(:textResultForLlm ,(current-time-string) :resultType "success")))
+   (copilot-sdk-tool-success (current-time-string))))
 
 ;; Create a session
 (setq my-session
