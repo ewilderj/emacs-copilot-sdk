@@ -1,7 +1,7 @@
 ;;; copilot-sdk.el --- Elisp client for the GitHub Copilot SDK -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2026 Edd Wilder-James
-;; Author: Edd Wilder-James <edd@me.com>
+;; Author: Edd Wilder-James <https://github.com/ewilderj>
 ;; Version: 0.1.0
 ;; Package-Requires: ((emacs "29.1") (jsonrpc "1.0.25"))
 ;; Keywords: tools, ai
