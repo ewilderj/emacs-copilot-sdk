@@ -271,6 +271,14 @@ PARAMS-SCHEMA is an optional JSON Schema plist for the tool's parameters."
   "Return the current tool definitions as a vector (for JSON serialization)."
   (vconcat copilot-sdk--tool-defs))
 
+(defun copilot-sdk-tool-result (type text &rest format-args)
+  "Build a tool result plist.
+TYPE is \"success\", \"failure\", or \"rejected\".
+TEXT is the result string; if FORMAT-ARGS are given, TEXT is
+passed through `format' with them."
+  (let ((msg (if format-args (apply #'format text format-args) text)))
+    `(:textResultForLlm ,msg :resultType ,type)))
+
 (defun copilot-sdk-clear-tools ()
   "Remove all registered tools."
   (clrhash copilot-sdk--tool-handlers)
